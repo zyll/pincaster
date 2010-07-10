@@ -63,7 +63,7 @@ vows.describe('Records').addBatch({
         }
     }
 }).addBatch({
-    'when removing a properties': {
+    'when removing some properties': {
         topic: function() {
             var self = this
             new Record("remove prop record", layer2)
@@ -83,10 +83,36 @@ vows.describe('Records').addBatch({
             new Record("remove prop record", layer2)
                 .get(this.callback)
         },
-        'is no more in records properties': function (err, content) {
+        'are no more in records properties': function (err, content) {
             assert.isNull(err)
             assert.isUndefined(content.properties.apropertie)
             assert.isUndefined(content.properties.anotherone)
+        }
+    }
+}).addBatch({
+    'when removing properties field from the record': {
+        topic: function() {
+            var self = this
+            new Record("remove all prop record", layer2)
+                .create({apropertie: "propertie", anotherone: "other prop"}, function(err, content){
+                    new Record("remove all prop record", layer2)
+                        .remove(self.callback)
+                })
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'stored')
+        }
+    }
+}).addBatch({
+    'when reteiving record with all removed properties': {
+        topic: function() {
+            new Record("remove all prop record", layer2)
+                .get(this.callback)
+        },
+        'are no more in records properties': function (err, content) {
+            assert.isNull(err)
+            assert.isUndefined(content.properties)
         }
     }
 }).addBatch({
