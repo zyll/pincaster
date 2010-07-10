@@ -31,14 +31,35 @@ vows.describe('Records').addBatch({
 }).addBatch({
     'when retreiving a record': {
         topic: function() {
-            var r = new Record("first record", layer2)
-            r.get(this.callback)
+            new Record("first record", layer2)
+                .get(this.callback)
         },
         'ack': function (err, content) {
             assert.isNull(err)
             assert.equal(content.key, 'first record')
             assert.equal(content.type, 'hash')
             assert.deepEqual(content.properties, {plop: "plip"})
+        }
+    }
+    // todo test destroy layer.
+}).addBatch({
+    'when updating a record': {
+        topic: function() {
+            var self = this;
+            new Record("update record", layer2)
+                .create({"update_field": 'original value'}, function(err, content) {
+                    new Record("update record", layer2)
+                        .update({"update_field": 'new value'}, function(err, content){
+                            new Record("update record", layer2)
+                                .get(self.callback)
+                        })
+                })
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.key, 'update record')
+            assert.equal(content.type, 'hash')
+            assert.deepEqual(content.properties, {update_field: "new value"})
         }
     }
     // todo test destroy layer.
