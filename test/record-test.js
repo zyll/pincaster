@@ -63,6 +63,33 @@ vows.describe('Records').addBatch({
         }
     }
 }).addBatch({
+    'when removing a properties': {
+        topic: function() {
+            var self = this
+            new Record("remove prop record", layer2)
+                .create({apropertie: "propertie", anotherone: "other prop"}, function(err, content){
+                    new Record("remove prop record", layer2)
+                        .remove(["apropertie", "anotherone"], self.callback)
+                })
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'stored')
+        }
+    }
+}).addBatch({
+    'when reteiving record with a removed properties': {
+        topic: function() {
+            new Record("remove prop record", layer2)
+                .get(this.callback)
+        },
+        'is no more in records properties': function (err, content) {
+            assert.isNull(err)
+            assert.isUndefined(content.properties.apropertie)
+            assert.isUndefined(content.properties.anotherone)
+        }
+    }
+}).addBatch({
     'when deleting a layer': {
         topic: function() {
             layer2.destroy(this.callback)
@@ -72,5 +99,4 @@ vows.describe('Records').addBatch({
             assert.equal(content.status, 'deleted')
         }
     }
-    // todo test destroy layer.
 }).export(module)
