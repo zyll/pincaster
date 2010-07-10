@@ -116,6 +116,56 @@ vows.describe('Records').addBatch({
         }
     }
 }).addBatch({
+    'when adding an integer to the "remove all prop" record': {
+        topic: function() {
+            var self = this
+            new Record("remove all prop record", layer2)
+                .add({count_me: 1, buffer_me: 34.057657}, this.callback)
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'stored')
+        }
+    }
+}).addBatch({
+    'when reteiving record with properties': {
+        topic: function() {
+            new Record("remove all prop record", layer2)
+                .get(this.callback)
+        },
+        'properties "count_me" is udpated': function (err, content) {
+            assert.isNull(err)
+            assert.isNotNull(content.properties.count_me)
+            assert.isNotNull(content.properties.buffer_me)
+            assert.equal(content.properties.count_me, 1)
+            assert.equal(content.properties.buffer_me, 34)
+        }
+    }
+}).addBatch({
+    'when adding again an integer to the "remove all prop" record': {
+        topic: function() {
+            var self = this
+            new Record("remove all prop record", layer2)
+                .add({count_me: -2, buffer_me: 56}, this.callback)
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'stored')
+        }
+    }
+}).addBatch({
+    'when reteiving record with properties': {
+        topic: function() {
+            new Record("remove all prop record", layer2)
+                .get(this.callback)
+        },
+        'properties "count_me" is updated': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.properties.count_me, -1)
+            assert.equal(content.properties.buffer_me, 90)
+        }
+    }
+}).addBatch({
     'when deleting a layer': {
         topic: function() {
             layer2.destroy(this.callback)
