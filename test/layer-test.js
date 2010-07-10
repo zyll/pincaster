@@ -48,7 +48,7 @@ vows.describe('Layer').addBatch({
 }).addBatch({
     'when destroying': {
         topic: function() {
-            layers.destroy(layer, this.callback)
+            layer.destroy(this.callback)
         },
         'is deleted': function (err, topic) {
             assert.isNull(err)

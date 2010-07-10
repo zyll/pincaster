@@ -62,5 +62,15 @@ vows.describe('Records').addBatch({
             assert.deepEqual(content.properties, {update_field: "new value"})
         }
     }
+}).addBatch({
+    'when deleting a layer': {
+        topic: function() {
+            layer2.destroy(this.callback)
+        },
+        'ack': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'deleted')
+        }
+    }
     // todo test destroy layer.
 }).export(module)
