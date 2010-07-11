@@ -153,7 +153,6 @@ vows.describe('Records').addBatch({
             assert.equal(content.status, 'stored')
         }
     }
-
 }).addBatch({
     'when reteiving record with integer added again': {
         topic: function() {
@@ -166,6 +165,7 @@ vows.describe('Records').addBatch({
             assert.equal(content.properties.buffer_me, 90)
         }
     }
+
 }).addBatch({
     'when creating a record and marked as expirable': {
         topic: function() {

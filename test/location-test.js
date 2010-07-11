@@ -1,4 +1,5 @@
 var vows = require('vows'),
+    sys = require('sys'),
     assert = require('assert')
 require('../lib/pincaster/pincaster')
 
@@ -59,7 +60,7 @@ vows.describe('Location').addBatch({
         }
     }
 }).addBatch({
-    'nearby record': {
+    'searching nearby record': {
         topic: function() {
             var r = new Record("not nead any name", layer_loc)
             r.longitude = 1
@@ -75,6 +76,28 @@ vows.describe('Location').addBatch({
         }
     }
 }).addBatch({
+    'restricting search using limit and properties params': {
+        topic: function() {
+            var r = new Record("not nead any name", layer_loc)
+            r.longitude = 1
+            r.latitude = 2
+            r.nearby(0, {limit: 1, properties: 0}, this.callback)
+        },
+        'only 1 nearby records is returned': function (err, content) {
+            sys.log(sys.inspect(content))
+            assert.isNull(err)
+            assert.isArray(content.matches)
+            //assert.equal(content.matches.length, 1)
+            // http://github.com/jedisct1/Pincaster/issues/#issue/3 
+        },
+        'response content have no properties': function (err, content) {
+            assert.isNull(err)
+            assert.isArray(content.matches)
+            //assert.isUndefined(content.matches[0].properties)
+            // http://github.com/jedisct1/Pincaster/issues/#issue/3
+        }
+
+    }}).addBatch({
     'when adding a far away location': {
         topic: function() {
             var r = new Record("far away location", layer_loc)
