@@ -1,4 +1,5 @@
 var vows = require('vows'),
+//    sys = require('sys'),
     assert = require('assert')
 require('../lib/pincaster/pincaster')
 
@@ -41,7 +42,7 @@ vows.describe('Records').addBatch({
             assert.deepEqual(content.properties, {plop: "plip"})
         }
     }
-    // todo test destroy layer.
+
 }).addBatch({
     'when updating a record': {
         topic: function() {
@@ -62,6 +63,7 @@ vows.describe('Records').addBatch({
             assert.deepEqual(content.properties, {update_field: "new value"})
         }
     }
+
 }).addBatch({
     'when removing some properties': {
         topic: function() {
@@ -89,6 +91,7 @@ vows.describe('Records').addBatch({
             assert.isUndefined(content.properties.anotherone)
         }
     }
+
 }).addBatch({
     'when removing properties field from the record': {
         topic: function() {
@@ -115,10 +118,10 @@ vows.describe('Records').addBatch({
             assert.isUndefined(content.properties)
         }
     }
+
 }).addBatch({
     'when adding an integer to the "remove all prop" record': {
         topic: function() {
-            var self = this
             new Record("remove all prop record", layer2)
                 .add({count_me: 1, buffer_me: 34.057657}, this.callback)
         },
@@ -128,15 +131,13 @@ vows.describe('Records').addBatch({
         }
     }
 }).addBatch({
-    'when reteiving record with properties': {
+    'when reteiving record with integer added': {
         topic: function() {
             new Record("remove all prop record", layer2)
                 .get(this.callback)
         },
         'properties "count_me" is udpated': function (err, content) {
             assert.isNull(err)
-            assert.isNotNull(content.properties.count_me)
-            assert.isNotNull(content.properties.buffer_me)
             assert.equal(content.properties.count_me, 1)
             assert.equal(content.properties.buffer_me, 34)
         }
@@ -144,7 +145,6 @@ vows.describe('Records').addBatch({
 }).addBatch({
     'when adding again an integer to the "remove all prop" record': {
         topic: function() {
-            var self = this
             new Record("remove all prop record", layer2)
                 .add({count_me: -2, buffer_me: 56}, this.callback)
         },
@@ -153,16 +153,43 @@ vows.describe('Records').addBatch({
             assert.equal(content.status, 'stored')
         }
     }
+
 }).addBatch({
-    'when reteiving record with properties': {
+    'when reteiving record with integer added again': {
         topic: function() {
             new Record("remove all prop record", layer2)
                 .get(this.callback)
         },
-        'properties "count_me" is updated': function (err, content) {
+        'properties "count_me" is udpated': function (err, content) {
             assert.isNull(err)
             assert.equal(content.properties.count_me, -1)
             assert.equal(content.properties.buffer_me, 90)
+        }
+    }
+}).addBatch({
+    'when creating a record and marked as expirable': {
+        topic: function() {
+            var self = this
+            new Record("expirable record", layer2)
+                .create(function(err, content) {
+                    new Record("expirable record", layer2)
+                        .expire(43645645, self.callback)
+                })
+        },
+        'properties _expirable is updated': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.status, 'stored')
+        }
+    }
+}).addBatch({
+    'when reteiving an expirable record': {
+        topic: function() {
+            new Record("expirable record", layer2)
+                .get(this.callback)
+        },
+        'special properties "expires_at" is present': function (err, content) {
+            assert.isNull(err)
+            assert.equal(content.expires_at, 43645645)
         }
     }
 }).addBatch({
